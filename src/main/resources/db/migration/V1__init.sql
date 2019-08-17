@@ -20,6 +20,14 @@ CREATE TABLE habits (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE events (
+    id serial,
+    title varchar(50) NOT NULL,
+    start varchar(50) NOT NULL,
+    ended varchar(50) NOT NULL,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE users_roles (
     user_id     int NOT NULL,
     role_id     int NOT NULL,
@@ -47,7 +55,6 @@ CREATE TABLE users_habits (
     REFERENCES habits (id)
     ON DELETE NO ACTION ON UPDATE NO ACTION
 );
-
 
 INSERT INTO roles (name)
 VALUES

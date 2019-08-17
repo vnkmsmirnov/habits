@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "event")
+@Table(name = "events")
 public class Event {
     @Id
     @GeneratedValue
@@ -21,7 +21,7 @@ public class Event {
     @Column(name = "start")
     private String start;
 
-    @Column(name = "end")
+    @Column(name = "ended")
     private String end;
 
     public Event(String title, String start, String end) {
