@@ -28,6 +28,7 @@ form.dialog({
             disabled: true
         }]
 });
+
 var event_start = $('#event_start');
 var event_end = $('#event_end');
 var event_type = $('#event_type');

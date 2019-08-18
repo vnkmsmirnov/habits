@@ -1,25 +1,49 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>FullCalendar</title>
+    <title>calendar demo</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link rel="stylesheet" href="fс/packages/core/main.css">
-    <link rel="stylesheet" href="css/style.css">
+
+    <link rel='stylesheet' href='webjars/fullcalendar/3.5.1/dist/fullcalendar.css' />
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link type="text/javascript" rel="stylesheet" href="js/main.js" />
+
+    <script src="webjars/jquery/2.0.3/jquery.min.js"></script>
+    <script src='webjars/moment/2.19.1/min/moment.min.js'></script>
+    <script src='webjars/fullcalendar/3.5.1/dist/fullcalendar.js'></script>
+    <script type="text/javascript" src="js/main.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             $('#calendar').fullCalendar({
                 events: {
-                    url : '/api/event/all'
+                    url : '/api/event/all',
+                },
+                firstDay: 1,
+                height: 500,
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
                 }
             });
         });
     </script>
 </head>
-<body>
-    <div id='calendar'></div>
 
-    <script src="fс/packages/moment/main.js"></script>
-    <script src="fс/packages/core/main.js"></script>
-    <script src="js/main.js"></script>
+<body>
+    <div id='calendar' style="width:1300px"></div>
+    <p></p>
+    <button id="add_event_button">Add event</button>
+    <div id="js/dialog-form.js" title="Event">
+        <form>
+            <p><label for="event_type">Event</label>
+                <input type="text" id="event_type" name="event_type" value=""></p>
+            <p><label for="event_start">Start</label>
+                <input type="text" name="event_start" id="event_start"/></p>
+            <p><label for="event_end">End</label>
+                <input type="text" name="event_end" id="event_end"/></p>
+            <input type="hidden" name="event_id" id="event_id" value="">
+        </form>
+    </div>
 </body>
 </html>
