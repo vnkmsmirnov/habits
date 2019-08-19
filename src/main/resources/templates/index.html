@@ -1,25 +1,76 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>calendar demo</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>calendar demo</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/sunny/jquery-ui.css">
 
     <link rel='stylesheet' href='webjars/fullcalendar/3.5.1/dist/fullcalendar.css' />
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
-    <link type="text/javascript" rel="stylesheet" href="js/main.js" />
+    <link type="text/javascript" rel="stylesheet" href="../static/js/main.js" />
 
-    <script src="webjars/jquery/2.0.3/jquery.min.js"></script>
+    <!--<script src="webjars/jquery/2.0.3/jquery.min.js"></script>-->
     <script src='webjars/moment/2.19.1/min/moment.min.js'></script>
     <script src='webjars/fullcalendar/3.5.1/dist/fullcalendar.js'></script>
-    <script type="text/javascript" src="js/main.js"></script>
+
+    <!--<script type="text/javascript" src="../static/js/main.js"></script>-->
+
     <script type="text/javascript">
+        // $(function() {
+        //
+        //     $('#dialog').dialog({
+        //         autoOpen: false
+        //     });
+        //
+        //     $('button').button().click(function(e) {
+        //         $('#dialog').dialog("open")
+        //     });
+        //
+        // });
+
+        $(function () {
+
+            $('#dialog-form').dialog({
+                autoOpen: false,
+                buttons: [{
+                    id: 'add',
+                    text: 'Добавить',
+                    click: function() {
+                        //some code
+                    }
+                },
+                    {   id: 'edit',
+                        text: 'Изменить',
+                        click: function() {
+                            //some code
+                        }
+                    },
+                    {   id: 'cancel',
+                        text: 'Отмена',
+                        click: function() {
+                            $(this).dialog('close');
+                            emptyForm();
+                        }
+                    },
+                    {   id: 'delete',
+                        text: 'Удалить',
+                        click: function() {
+                            //some code
+                        },
+                        disabled: true
+                    }]
+            });
+
+        });
+
         $(document).ready(function() {
             $('#calendar').fullCalendar({
                 events: {
                     url : '/api/event/all',
                 },
                 firstDay: 1,
-                height: 500,
+                height: 600,
                 header: {
                     left: 'prev,next today',
                     center: 'title',
@@ -31,10 +82,17 @@
 </head>
 
 <body>
+
     <div id='calendar' style="width:1300px"></div>
     <p></p>
+
+    <!--<div id="dialog" title="Диалоговое окно">-->
+        <!--Содержимое, которое будет отображаться в диалоговом окне. К этому <b>содержимому</b> могут применяться <em>стили</em>.-->
+    <!--</div>-->
+    <!--<button>Показать диалоговое окно</button>-->
+
     <button id="add_event_button">Add event</button>
-    <div id="js/dialog-form.js" title="Event">
+    <div id="dialog-form" title="Event">
         <form>
             <p><label for="event_type">Event</label>
                 <input type="text" id="event_type" name="event_type" value=""></p>
