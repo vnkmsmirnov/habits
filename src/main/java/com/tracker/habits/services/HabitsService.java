@@ -1,6 +1,6 @@
 package com.tracker.habits.services;
 
-import com.tracker.habits.entities.Habit;
+import com.tracker.habits.entities.Event;
 import com.tracker.habits.repositories.HabitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,11 @@ public class HabitsService {
         this.habitRepository = habitRepository;
     }
 
-    public List<Habit> findAll() {
-        return (List<Habit>) habitRepository.findAll();
+    public List<Event> findAll() {
+        return (List<Event>) habitRepository.findAll();
+    }
+
+    public void saveAll(List<Event> events) {
+        habitRepository.saveAll(events);
     }
 }

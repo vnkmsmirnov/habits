@@ -16,14 +16,16 @@
     <tr>
         <th>ID</th>
         <th>Название привычки</th>
-        <th>Дата отметки</th>
+        <th>Дата начала</th>
+        <th>Дата окончания</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="habit : ${habits}">
         <td th:text="${habit.id}"/>
-        <td th:text="${habit.name}"/>
-        <td th:text="${habit.mark}"/>
+        <td th:text="${habit.getTitle()}"/>
+        <td th:text="${habit.getStart()}"/>
+        <td th:text="${habit.getEnd()}"/>
     </tr>
     </tbody>
 </table>

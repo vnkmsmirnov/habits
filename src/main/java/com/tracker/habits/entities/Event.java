@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -15,17 +16,17 @@ public class Event {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "title")
-    private String title;
+    @Column(name = "type")
+    private String type;
 
     @Column(name = "start")
-    private String start;
+    private Date start;
 
     @Column(name = "ended")
-    private String end;
+    private Date end;
 
-    public Event(String title, String start, String end) {
-        this.title = title;
+    public Event(String type, Date start, Date end) {
+        this.type = type;
         this.start = start;
         this.end = end;
     }

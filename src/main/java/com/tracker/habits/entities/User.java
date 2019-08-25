@@ -38,9 +38,9 @@ public class User {
     @JoinTable(name = "users_habits",
     joinColumns = @JoinColumn(name = "user_id"),
     inverseJoinColumns = @JoinColumn(name = "habit_id"))
-    private Collection<Habit> habits;
+    private Collection<Event> habits;
 
-    public User(String username, String password, String name, String email, Collection<Role> roles, Collection<Habit> habits) {
+    public User(String username, String password, String name, String email, Collection<Role> roles, Collection<Event> habits) {
         this.username = username;
         this.password = password;
         this.name = name;

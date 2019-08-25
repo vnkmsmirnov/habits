@@ -1,6 +1,6 @@
 package com.tracker.habits.controllers;
 
-import com.tracker.habits.entities.Habit;
+import com.tracker.habits.entities.Event;
 import com.tracker.habits.entities.User;
 import com.tracker.habits.services.HabitsService;
 import com.tracker.habits.services.UserRepository;
@@ -39,7 +39,7 @@ public class HabitsController {
             model.addAttribute("username", user.getUsername());
         }
 
-        List<Habit> allHabits = habitsService.findAll();
+        List<Event> allHabits = habitsService.findAll();
 
         model.addAttribute("habits", allHabits);
 

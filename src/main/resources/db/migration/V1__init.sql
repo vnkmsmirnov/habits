@@ -13,18 +13,11 @@ CREATE TABLE roles (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE habits (
-    id serial,
-    name varchar(100) NOT NULL,
-    mark timestamp,
-    PRIMARY KEY (id)
-);
-
 CREATE TABLE events (
     id serial,
-    title varchar(50) NOT NULL,
-    start varchar(50) NOT NULL,
-    ended varchar(50) NOT NULL,
+    type varchar(50) NOT NULL,
+    start timestamp,
+    ended timestamp,
     PRIMARY KEY (id)
 );
 
@@ -42,19 +35,23 @@ CREATE TABLE users_roles (
     ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
-CREATE TABLE users_habits (
+CREATE TABLE users_events (
     user_id     int NOT NULL,
-    habit_id    int NOT NULL,
-    PRIMARY KEY (user_id, habit_id),
+    event_id    int NOT NULL,
+    PRIMARY KEY (user_id, event_id),
 
     CONSTRAINT FK_USER_ID_02 FOREIGN KEY (user_id)
     REFERENCES users (id)
     ON DELETE NO ACTION ON UPDATE NO ACTION,
 
-    CONSTRAINT FK_HABIT_ID FOREIGN KEY (habit_id)
-    REFERENCES habits (id)
+    CONSTRAINT FK_HABIT_ID FOREIGN KEY (event_id)
+    REFERENCES events (id)
     ON DELETE NO ACTION ON UPDATE NO ACTION
 );
+
+INSERT INTO events (type, start, ended)
+VALUES
+('Run', '2019-08-25', '2019-08-26');
 
 INSERT INTO roles (name)
 VALUES
@@ -64,13 +61,6 @@ INSERT INTO users (username, password, name, email)
 VALUES
 ('admin', '$2a$04$NYqjpQYkO9H3AEJt0eT3ROHPgw5MDuqWuE7WHXlQwi5Sg0e2j3WNu', 'Bender', 'bender@mail.ru');
 
-INSERT INTO habits (name, mark)
-VALUES
-('user check', TIMESTAMP '2019-08-01 21:10:38'),
-('user check', TIMESTAMP '2019-07-06 19:00:00'),
-('user check', TIMESTAMP '2019-10-02 19:00:00'),
-('user check', TIMESTAMP '2019-07-01 19:00:00'),
-('user check', TIMESTAMP '2019-08-02 19:00:00');
 
 INSERT INTO users_roles (user_id, role_id)
 VALUES

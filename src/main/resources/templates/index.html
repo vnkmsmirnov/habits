@@ -8,28 +8,42 @@
     <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/sunny/jquery-ui.css">
 
     <link rel='stylesheet' href='webjars/fullcalendar/3.5.1/dist/fullcalendar.css' />
-    <link type="text/javascript" rel="stylesheet" href="../static/js/main.js" />
+    <link type="text/javascript" rel="stylesheet" href="js/main.js" />
 
-    <!--<script src="webjars/jquery/2.0.3/jquery.min.js"></script>-->
     <script src='webjars/moment/2.19.1/min/moment.min.js'></script>
     <script src='webjars/fullcalendar/3.5.1/dist/fullcalendar.js'></script>
 
-    <!--<script type="text/javascript" src="../static/js/main.js"></script>-->
 
+    <link type="text/css" href="js/jquery-ui-1.8.17.custom/css/redmond/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <script type="text/javascript" src="js/jquery-ui-1.8.17.custom/js/jquery-ui-1.8.17.custom.min.js"></script>
+
+</head>
+
+<body>
+
+    <div id='calendar' style="width:1300px"></div>
+    <p></p>
+
+    <button id="add_event_button">Add event</button>
+    <div id="dialog-form" title="Event">
+        <form>
+            <p><label for="event_type">Event</label>
+                <input type="text" id="event_type" name="event_type" value=""></p>
+            <p><label for="event_start">Start</label>
+                <input type="text" name="event_start" id="event_start"/></p>
+            <p><label for="event_end">End</label>
+                <input type="text" name="event_end" id="event_end"/></p>
+            <input type="hidden" name="event_id" id="event_id" value="">
+        </form>
+    </div>
     <script type="text/javascript">
-        // $(function() {
-        //
-        //     $('#dialog').dialog({
-        //         autoOpen: false
-        //     });
-        //
-        //     $('button').button().click(function(e) {
-        //         $('#dialog').dialog("open")
-        //     });
-        //
-        // });
+
 
         $(function () {
+
+            $('button').button().click(function(e) {
+                $('#dialog-form').dialog("open")
+            });
 
             $('#dialog-form').dialog({
                 autoOpen: false,
@@ -37,7 +51,26 @@
                     id: 'add',
                     text: 'Добавить',
                     click: function() {
-                        //some code
+                        $.ajax({
+                            type: "POST",
+                            url: "/api/event/add",
+                            data: {
+                                start: event_start.val(),
+                                end: event_end.val(),
+                                type: event_type.val(),
+                                op: 'add'
+                            },
+                            success: function(id){
+                                calendar.fullCalendar('renderEvent', {
+                                    id: id,
+                                    title: event_type.val(),
+                                    start: event_start.val(),
+                                    end: event_end.val(),
+                                    allDay: false
+                                });
+                            }
+                        });
+                        emptyForm();
                     }
                 },
                     {   id: 'edit',
@@ -64,10 +97,52 @@
 
         });
 
+        var event_start = $('#event_start');
+        var event_end = $('#event_end');
+        var event_type = $('#event_type');
+        var calendar = $('#calendar');
+        var form = $('#dialog-form');
+        var event_id = $('#event_id');
+        var format = "MM/dd/yyyy HH:mm";
+        /* кнопка добавления события */
+        $('#add_event_button').button().click(function(){
+            formOpen('add');
+        });
+        /** функция очистки формы */
+        function emptyForm() {
+            event_start.val("");
+            event_end.val("");
+            event_type.val("");
+            event_id.val("");
+        }
+        /** режимы открытия формы */
+        function formOpen(mode) {
+            if(mode == 'add') {
+                /** скрываем кнопки Удалить, Изменить и отображаем Добавить*/
+                $('#add').show();
+                $('#edit').hide();
+                $("#delete").button("option", "disabled", true);
+            }
+            else if(mode == 'edit') {
+                /** скрываем кнопку Добавить, отображаем Изменить и Удалить*/
+                $('#edit').show();
+                $('#add').hide();
+                $("#delete").button("option", "disabled", false);
+            }
+            form.dialog('open');
+            // event_start.datetimepicker({hourGrid: 4, minuteGrid: 10, dateFormat: 'mm/dd/yy'});
+            // event_end.datetimepicker({hourGrid: 4, minuteGrid: 10, dateFormat: 'mm/dd/yy'});
+        }
+
+        $(function() {
+            $( "#datepicker" ).datepicker();
+        });
+
+
         $(document).ready(function() {
             $('#calendar').fullCalendar({
                 events: {
-                    url : '/api/event/all',
+                    url : '/api/event/all'
                 },
                 firstDay: 1,
                 height: 600,
@@ -75,33 +150,15 @@
                     left: 'prev,next today',
                     center: 'title',
                     right: 'month,agendaWeek,agendaDay'
+                },
+                dayClick: function(date, allDay, jsEvent, view) {
+                    var newDate = $.fullCalendar.formatDate(date, format);
+                    event_start.val(newDate);
+                    event_end.val(newDate);
+                    formOpen('add');
                 }
             });
         });
     </script>
-</head>
-
-<body>
-
-    <div id='calendar' style="width:1300px"></div>
-    <p></p>
-
-    <!--<div id="dialog" title="Диалоговое окно">-->
-        <!--Содержимое, которое будет отображаться в диалоговом окне. К этому <b>содержимому</b> могут применяться <em>стили</em>.-->
-    <!--</div>-->
-    <!--<button>Показать диалоговое окно</button>-->
-
-    <button id="add_event_button">Add event</button>
-    <div id="dialog-form" title="Event">
-        <form>
-            <p><label for="event_type">Event</label>
-                <input type="text" id="event_type" name="event_type" value=""></p>
-            <p><label for="event_start">Start</label>
-                <input type="text" name="event_start" id="event_start"/></p>
-            <p><label for="event_end">End</label>
-                <input type="text" name="event_end" id="event_end"/></p>
-            <input type="hidden" name="event_id" id="event_id" value="">
-        </form>
-    </div>
 </body>
 </html>
