@@ -20,7 +20,7 @@ public class HabitsService {
         return (List<Event>) habitRepository.findAll();
     }
 
-    public void saveAll(List<Event> events) {
-        habitRepository.saveAll(events);
+    public void saveOrUpdate(Event event) {
+        habitRepository.save(event);
     }
 }

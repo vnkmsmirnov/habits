@@ -5,9 +5,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 
 @Component
 public interface HabitRepository extends JpaSpecificationExecutor<Event>, PagingAndSortingRepository<Event, Long> {
-    void saveAll(Event event);
+
 }

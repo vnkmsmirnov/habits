@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
@@ -12,7 +12,7 @@ import java.util.Date;
 @Table(name = "events")
 public class Event {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -20,12 +20,12 @@ public class Event {
     private String type;
 
     @Column(name = "start")
-    private Date start;
+    private Timestamp start;
 
     @Column(name = "ended")
-    private Date end;
+    private Timestamp end;
 
-    public Event(String type, Date start, Date end) {
+    public Event(String type, Timestamp start, Timestamp end) {
         this.type = type;
         this.start = start;
         this.end = end;

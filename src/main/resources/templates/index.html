@@ -52,7 +52,7 @@
                     text: 'Добавить',
                     click: function() {
                         $.ajax({
-                            type: "POST",
+                            type: "GET",
                             url: "/api/event/add",
                             data: {
                                 start: event_start.val(),

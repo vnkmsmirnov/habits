@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/event")
@@ -30,31 +29,33 @@ public class RestWebController {
     public String getEvents() {
         System.out.println("Inside method getEvents");
         String jsonMsg = null;
-        SimpleDateFormat someDate = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         try {
-
             List<Event> allHabits = habitsService.findAll();
-            List<Event> saveEvents = new ArrayList<>();
-            Event event = new Event();
-            event.setType("first event");
-            event.setStart(someDate.parse("2019-08-29"));
-            saveEvents.add(event);
-
-            habitsService.saveAll(saveEvents);
-
+            for (Event e : allHabits) {
+                System.out.println(e.getType() + " " + e.getStart() + " " + e.getEnd());
+            }
             ObjectMapper mapper = new ObjectMapper();
             jsonMsg =  mapper.writerWithDefaultPrettyPrinter().writeValueAsString(allHabits);
         } catch (IOException ioex) {
             System.out.println(ioex.getMessage());
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
         return jsonMsg;
     }
 
     @GetMapping(value = "/add")
     public String addEvents() {
-        System.out.println("In method AssEvents");
+        System.out.println("In method AddEvents");
+        Date date = new Date();
+        String jsonMsg = null;
+        Event event = new Event();
+        event.setType("first event");
+        java.sql.Timestamp timestamp = new java.sql.Timestamp(date.getTime());
+        event.setStart(timestamp);
+        event.setEnd(timestamp);
+
+
+        System.out.println(event.getStart());
+        habitsService.saveOrUpdate(event);
         return "index";
     }
 }
