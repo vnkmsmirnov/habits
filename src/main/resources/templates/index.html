@@ -51,13 +51,14 @@
                     id: 'add',
                     text: 'Добавить',
                     click: function() {
+
                         $.ajax({
                             type: "GET",
                             url: "/api/event/add",
                             data: {
+                                type: event_type.val(),
                                 start: event_start.val(),
                                 end: event_end.val(),
-                                type: event_type.val(),
                                 op: 'add'
                             },
                             success: function(id){
@@ -97,23 +98,23 @@
 
         });
 
+        var event_id = $('#event_id');
+        var event_type = $('#event_type');
         var event_start = $('#event_start');
         var event_end = $('#event_end');
-        var event_type = $('#event_type');
         var calendar = $('#calendar');
         var form = $('#dialog-form');
-        var event_id = $('#event_id');
-        var format = "MM/dd/yyyy HH:mm";
+        var format = "DD/MM/YYYY HH:mm";
         /* кнопка добавления события */
         $('#add_event_button').button().click(function(){
             formOpen('add');
         });
         /** функция очистки формы */
         function emptyForm() {
+            event_id.val("");
+            event_type.val("");
             event_start.val("");
             event_end.val("");
-            event_type.val("");
-            event_id.val("");
         }
         /** режимы открытия формы */
         function formOpen(mode) {
@@ -130,12 +131,18 @@
                 $("#delete").button("option", "disabled", false);
             }
             form.dialog('open');
-            // event_start.datetimepicker({hourGrid: 4, minuteGrid: 10, dateFormat: 'mm/dd/yy'});
-            // event_end.datetimepicker({hourGrid: 4, minuteGrid: 10, dateFormat: 'mm/dd/yy'});
         }
 
         $(function() {
-            $( "#datepicker" ).datepicker('getDate');
+            // $( "#datepicker" ).datepicker('getDate');
+            $("#datepicker").datepicker({
+                beforeShowDay: function(date) {
+                    var selectable = true;
+                    var classname = "";
+                    event_type = "\u20AC" + dayrates[date.getDay()];
+                    return [selectable, classname, event_type];
+                }
+            });
         });
 
 

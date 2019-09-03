@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.IOException;
 
@@ -25,16 +28,13 @@ public class RestWebController {
 
     @GetMapping(value = "/all")
     public String getEvents() {
-        System.out.println("Inside method getEvents");
-        String jsonMsg = null;
+        String jsonMessage = null;
         try {
-            List<Event> allHabits = habitsService.findAll();
-            ObjectMapper mapper = new ObjectMapper();
-            jsonMsg =  mapper.writerWithDefaultPrettyPrinter().writeValueAsString(allHabits);
-        } catch (IOException ioex) {
-            System.out.println(ioex.getMessage());
+            jsonMessage = getAllEventsInJSON();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return jsonMsg;
+        return jsonMessage;
     }
 
     @GetMapping(value = "/add")
@@ -42,29 +42,33 @@ public class RestWebController {
                             @RequestParam(value = "start", required = false) String start,
                             @RequestParam(value = "end", required = false) String end,
                             @RequestParam(value = "type", required = false) String type) {
-
-        System.out.println("In method AddEvents");
-
         String jsonMsg = null;
+        String pattern = "dd/MM/yyyy HH:mm";
+        Integer timeZone = 180;
+        Event event = new Event();
+        event.setType(type);
 
-        System.out.println(start);
-        System.out.println(end);
-        System.out.println(type);
-
-//        String json = readJsonFromUrl(sURL);
-//        System.out.println(json);
-
-
-//        Date date = new Date();
-//        Event event = new Event();
-//        event.setType("first event");
-//        java.sql.Timestamp timestamp = new java.sql.Timestamp(date.getTime());
-//        event.setStart(timestamp);
-//        event.setEnd(timestamp);
-//        System.out.println(event.getStart());
-//        habitsService.saveOrUpdate(event);
+        Timestamp timestamp;
+        try {
+            Date dateStart = new SimpleDateFormat(pattern).parse(start + timeZone);
+            Date dateEnd = new SimpleDateFormat(pattern).parse(end + timeZone);
+            timestamp = new Timestamp(dateStart.getTime());
+            event.setStart(timestamp);
+            timestamp = new Timestamp(dateEnd.getTime());
+            event.setEnd(timestamp);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        habitsService.saveOrUpdate(event);
 
         return "index";
     }
 
+    private String getAllEventsInJSON() throws IOException {
+        String jsonMsg = null;
+        List<Event> allHabits = habitsService.findAll();
+        ObjectMapper mapper = new ObjectMapper();
+        jsonMsg =  mapper.writerWithDefaultPrettyPrinter().writeValueAsString(allHabits);
+        return jsonMsg;
+    }
 }
