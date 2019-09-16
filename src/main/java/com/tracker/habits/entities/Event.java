@@ -17,7 +17,7 @@ public class Event {
     private Long id;
 
     @Column(name = "type")
-    private String type;
+    private String title;
 
     @Column(name = "start")
     private Timestamp start;
@@ -25,8 +25,9 @@ public class Event {
     @Column(name = "ended")
     private Timestamp end;
 
-    public Event(String type, Timestamp start, Timestamp end) {
-        this.type = type;
+
+    public Event(String title, Timestamp start, Timestamp end) {
+        this.title = title;
         this.start = start;
         this.end = end;
     }

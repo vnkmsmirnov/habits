@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HabitsService {
@@ -22,5 +23,9 @@ public class HabitsService {
 
     public void saveOrUpdate(Event event) {
         habitRepository.save(event);
+    }
+
+    public Optional<Event> findById(Long id) {
+        return habitRepository.findById(id);
     }
 }

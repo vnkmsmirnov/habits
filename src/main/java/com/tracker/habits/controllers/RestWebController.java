@@ -34,6 +34,7 @@ public class RestWebController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return jsonMessage;
     }
 
@@ -42,33 +43,53 @@ public class RestWebController {
                             @RequestParam(value = "start", required = false) String start,
                             @RequestParam(value = "end", required = false) String end,
                             @RequestParam(value = "type", required = false) String type) {
-        String jsonMsg = null;
+
         String pattern = "dd/MM/yyyy HH:mm";
         Integer timeZone = 180;
-        Event event = new Event();
-        event.setType(type);
+        String jsonMessage = null;
 
-        Timestamp timestamp;
+        Event event = new Event();
+
+        if (type != null) {
+            if (type.equals("")) {
+                event.setTitle("Default");
+
+            } else {
+                event.setTitle(type);
+            }
+        }
+
         try {
-            Date dateStart = new SimpleDateFormat(pattern).parse(start + timeZone);
-            Date dateEnd = new SimpleDateFormat(pattern).parse(end + timeZone);
-            timestamp = new Timestamp(dateStart.getTime());
-            event.setStart(timestamp);
-            timestamp = new Timestamp(dateEnd.getTime());
-            event.setEnd(timestamp);
+            if (start != null && end != null) {
+                if (start.equals("")) {
+                    event.setStart(new Timestamp(new Date().getTime()));
+                } else {
+                    event.setStart(new Timestamp(new SimpleDateFormat(pattern).parse(start + timeZone).getTime()));
+                }
+
+                if (end.equals("")) {
+                    event.setEnd(new Timestamp(new Date().getTime()));
+                } else {
+                    event.setEnd(new Timestamp(new SimpleDateFormat(pattern).parse(end + timeZone).getTime()));
+                }
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
         habitsService.saveOrUpdate(event);
 
-        return "index";
+
+        try {
+            jsonMessage = getAllEventsInJSON();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return jsonMessage;
     }
 
     private String getAllEventsInJSON() throws IOException {
-        String jsonMsg = null;
         List<Event> allHabits = habitsService.findAll();
         ObjectMapper mapper = new ObjectMapper();
-        jsonMsg =  mapper.writerWithDefaultPrettyPrinter().writeValueAsString(allHabits);
-        return jsonMsg;
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(allHabits);
     }
 }

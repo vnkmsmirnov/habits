@@ -43,6 +43,6 @@ public class HabitsController {
 
         model.addAttribute("habits", allHabits);
 
-        return "habits";
+        return "login-page";
     }
 }
