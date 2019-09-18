@@ -27,8 +27,8 @@
             <h1>Fill in the fields to enter.</h1>
             <div class="login-container">
                 <form th:action="@{/authenticateTheUser}" method="post">
-                    <input style="margin-bottom: 25px" type="text" id="username" class="form-control" placeholder="Username" name="username">
-                    <input style="margin-bottom: 25px" type="password" id="password" class="form-control" placeholder="Password" name="password">
+                    <input style="margin-bottom: 25px" type="text" id="username" class="ui-widget ui-corner-all" placeholder="Username" name="username">
+                    <input style="margin-bottom: 25px" type="password" id="password" class="ui-widget ui-corner-all" placeholder="Password" name="password">
                     <button style="margin-bottom: 25px" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="submit">
                         <span class="ui-button-text">Login</span></button>
                 </form>
@@ -37,6 +37,7 @@
     </div>
 
     <div sec:authorize="!isAnonymous()" class="form-horizontal">
+        <h2 th:text="'Пользователь:  ' + ${username}"/>
         <div id='calendar' style="width:1300px"></div>
         <p></p>
 
@@ -99,9 +100,13 @@
                                         end: event_end.val(),
                                         allDay: false
                                     });
+                                    $('#calendar').fullCalendar('rerenderEvents');
+                                    $('#calendar').fullCalendar('refetchEvents');
                                 }
                             });
+
                             emptyForm();
+                            $(this).dialog('close');
                         }
                     },
                         {   id: 'edit',
@@ -174,7 +179,6 @@
                     }
                 });
             });
-
 
             $(document).ready(function() {
                 $('#calendar').fullCalendar({

@@ -78,13 +78,7 @@ public class RestWebController {
         }
         habitsService.saveOrUpdate(event);
 
-
-        try {
-            jsonMessage = getAllEventsInJSON();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return jsonMessage;
+        return getEvents();
     }
 
     private String getAllEventsInJSON() throws IOException {
