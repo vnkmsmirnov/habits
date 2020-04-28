@@ -3,6 +3,7 @@ package com.tracker.habits.services;
 import com.tracker.habits.entities.Role;
 import com.tracker.habits.entities.User;
 import com.tracker.habits.repositories.RoleRepository;
+import com.tracker.habits.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,12 +17,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserRepository {
-    private com.tracker.habits.repositories.UserRepository userRepository;
+    private UserRepo userRepo;
     private RoleRepository roleRepository;
 
     @Autowired
-    public void setUserRepository(com.tracker.habits.repositories.UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public void setUserRepository(UserRepo userRepo) {
+        this.userRepo = userRepo;
     }
 
     @Autowired
@@ -32,13 +33,13 @@ public class UserServiceImpl implements UserRepository {
     @Override
     @Transactional
     public User findByUsername(String username) {
-        return userRepository.findOneByUsername(username);
+        return userRepo.findOneByUsername(username);
     }
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findOneByUsername(username);
+        User user = userRepo.findOneByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("Invalid username of password");
         }

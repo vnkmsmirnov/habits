@@ -2,13 +2,14 @@ package com.tracker.habits.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tracker.habits.entities.Event;
-import com.tracker.habits.services.HabitsService;
+import com.tracker.habits.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,34 +20,28 @@ import java.io.IOException;
 @RequestMapping("/api/event")
 public class RestWebController {
 
-    private HabitsService habitsService;
+    private com.tracker.habits.repositories.UserRepo userRepo;
 
     @Autowired
-    public void setHabitsService(HabitsService habitsService) {
-        this.habitsService = habitsService;
+    public void setUserRepo(com.tracker.habits.repositories.UserRepo userRepo) {
+        this.userRepo = userRepo;
     }
 
     @GetMapping(value = "/all")
-    public String getEvents() {
-        String jsonMessage = null;
-        try {
-            jsonMessage = getAllEventsInJSON();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public String getEvents(Principal principal) {
 
-        return jsonMessage;
+        return getAllEventsByUserInJson(principal.getName());
     }
 
     @GetMapping(value = "/add")
     public String addEvents(
-                            @RequestParam(value = "start", required = false) String start,
-                            @RequestParam(value = "end", required = false) String end,
-                            @RequestParam(value = "type", required = false) String type) {
+            @RequestParam(value = "start", required = false) String start,
+            @RequestParam(value = "end", required = false) String end,
+            @RequestParam(value = "type", required = false) String type,
+            Principal principal) {
 
         String pattern = "dd/MM/yyyy HH:mm";
         Integer timeZone = 180;
-        String jsonMessage = null;
 
         Event event = new Event();
 
@@ -76,14 +71,24 @@ public class RestWebController {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        habitsService.saveOrUpdate(event);
 
-        return getEvents();
+        if (principal != null) {
+            User user = userRepo.findOneByUsername(principal.getName());
+            user.getHabits().add(event);
+            userRepo.save(user);
+        }
+
+        return getAllEventsByUserInJson(principal.getName());
     }
 
-    private String getAllEventsInJSON() throws IOException {
-        List<Event> allHabits = habitsService.findAll();
+    private String getAllEventsByUserInJson(String username) {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(allHabits);
+        String result = "";
+        try {
+            result = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(userRepo.findOneByUsername(username).getHabits());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }

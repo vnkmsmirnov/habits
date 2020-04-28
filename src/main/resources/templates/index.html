@@ -7,37 +7,57 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/sunny/jquery-ui.css">
-
     <link rel='stylesheet' href='webjars/fullcalendar/3.5.1/dist/fullcalendar.css' />
     <link type="text/javascript" rel="stylesheet" href="js/main.js" />
 
     <script src='webjars/moment/2.19.1/min/moment.min.js'></script>
     <script src='webjars/fullcalendar/3.5.1/dist/fullcalendar.js'></script>
-
-
-    <link type="text/css" href="js/jquery-ui-1.8.17.custom/css/redmond/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
-    <script type="text/javascript" src="js/jquery-ui-1.8.17.custom/js/jquery-ui-1.8.17.custom.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script type="text/javascript" th:src="@{/js/main.js}"></script>
 </head>
 
 <body>
     <p></p>
-    <div class="container">
-        <div sec:authorize="isAnonymous()" class="form-horizontal">
-            <h1>Start page.</h1>
-            <h1>Fill in the fields to enter.</h1>
-            <div class="login-container">
-                <form th:action="@{/authenticateTheUser}" method="post">
-                    <input style="margin-bottom: 25px" type="text" id="username" class="ui-widget ui-corner-all" placeholder="Username" name="username">
-                    <input style="margin-bottom: 25px" type="password" id="password" class="ui-widget ui-corner-all" placeholder="Password" name="password">
-                    <button style="margin-bottom: 25px" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="submit">
-                        <span class="ui-button-text">Login</span></button>
-                </form>
+    <div>
+        <div sec:authorize="isAnonymous()" id="login">
+            <h3 class="text-center text-white pt-5">Login form</h3>
+            <div class="container">
+                <div id="login-row" class="row justify-content-center align-items-center">
+                    <div id="login-column" class="col-md-6">
+                        <div id="login-box" class="col-md-12">
+                            <form th:action="@{/authenticateTheUser}" id="login-form" class="form" action="" method="post">
+                                <h3 class="text-center text-info">Login</h3>
+                                <div class="form-group">
+                                    <label for="username" class="text-info">Username:</label><br>
+                                    <input type="text" name="username" id="username" placeholder="Username" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password" class="text-info">Password:</label><br>
+                                    <input type="password" name="password" id="password" placeholder="Password" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="remember-me" class="text-info"><span>Remember me</span> <span><input id="remember-me" name="remember-me" type="checkbox"></span></label><br>
+                                    <input type="submit" name="submit" class="btn btn-info btn-md" value="submit">
+                                </div>
+                                <div id="register-link" class="text-right">
+                                    <a href="#" class="text-info">Register here</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <div sec:authorize="!isAnonymous()" class="form-horizontal">
         <h2 th:text="'Пользователь:  ' + ${username}"/>
+        <div class="login-container">
+            <form th:action="@{/logout}" method="post">
+                <button class="btn btn-info btn-md" type="submit">
+                    <span class="ui-button-text">Logout</span></button>
+            </form>
+        </div>
         <div id='calendar' style="width:1300px"></div>
         <p></p>
 
@@ -57,150 +77,18 @@
 
 
         <table class="table table-hover">
-        <thead>
-        <tr>
-        <th>Название привычки</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="habit : ${habits}">
-        <td th:text="${habit.getTitle()}"/>
-        </tr>
-        </tbody>
+            <thead>
+                <tr>
+                    <th>Название привычки</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="habit : ${habits}">
+                    <td th:text="${habit.getTitle()}"/>
+                </tr>
+            </tbody>
         </table>
 
-        <script type="text/javascript">
-            $(function () {
-
-                $('button').button().click(function(e) {
-                    $('#dialog-form').dialog("open")
-                });
-
-                $('#dialog-form').dialog({
-                    autoOpen: false,
-                    buttons: [{
-                        id: 'add',
-                        text: 'Добавить',
-                        click: function() {
-
-                            $.ajax({
-                                type: "GET",
-                                url: "/api/event/add",
-                                data: {
-                                    type: event_type.val(),
-                                    start: event_start.val(),
-                                    end: event_end.val(),
-                                    op: 'add'
-                                },
-                                success: function(id){
-                                    calendar.fullCalendar('renderEvent', {
-                                        id: id,
-                                        title: event_type.val(),
-                                        start: event_start.val(),
-                                        end: event_end.val(),
-                                        allDay: false
-                                    });
-                                    $('#calendar').fullCalendar('rerenderEvents');
-                                    $('#calendar').fullCalendar('refetchEvents');
-                                }
-                            });
-
-                            emptyForm();
-                            $(this).dialog('close');
-                        }
-                    },
-                        {   id: 'edit',
-                            text: 'Изменить',
-                            click: function() {
-                                //some code
-                            }
-                        },
-                        {   id: 'cancel',
-                            text: 'Отмена',
-                            click: function() {
-                                $(this).dialog('close');
-                                emptyForm();
-                            }
-                        },
-                        {   id: 'delete',
-                            text: 'Удалить',
-                            click: function() {
-                                //some code
-                            },
-                            disabled: true
-                        }]
-                });
-
-            });
-
-            var event_id = $('#event_id');
-            var event_type = $('#event_type');
-            var event_start = $('#event_start');
-            var event_end = $('#event_end');
-            var calendar = $('#calendar');
-            var form = $('#dialog-form');
-            var format = "DD/MM/YYYY HH:mm";
-            /* кнопка добавления события */
-            $('#add_event_button').button().click(function(){
-                formOpen('add');
-            });
-            /** функция очистки формы */
-            function emptyForm() {
-                event_id.val("");
-                event_type.val("");
-                event_start.val("");
-                event_end.val("");
-            }
-            /** режимы открытия формы */
-            function formOpen(mode) {
-                if(mode == 'add') {
-                    /** скрываем кнопки Удалить, Изменить и отображаем Добавить*/
-                    $('#add').show();
-                    $('#edit').hide();
-                    $("#delete").button("option", "disabled", true);
-                }
-                else if(mode == 'edit') {
-                    /** скрываем кнопку Добавить, отображаем Изменить и Удалить*/
-                    $('#edit').show();
-                    $('#add').hide();
-                    $("#delete").button("option", "disabled", false);
-                }
-                form.dialog('open');
-            }
-
-            $(function() {
-                // $( "#datepicker" ).datepicker('getDate');
-                $("#datepicker").datepicker({
-                    beforeShowDay: function(date) {
-                        var selectable = true;
-                        var classname = "";
-                        event_type = "\u20AC" + dayrates[date.getDay()];
-                        return [selectable, classname, event_type];
-                    }
-                });
-            });
-
-            $(document).ready(function() {
-                $('#calendar').fullCalendar({
-                    events: {
-                        url : '/api/event/all'
-                    },
-                    firstDay: 1,
-                    height: 600,
-                    header: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'month,agendaWeek,agendaDay'
-                    },
-                    dayClick: function(date, allDay, jsEvent, view) {
-                        var newDate = $.fullCalendar.formatDate(date, format);
-                        event_start.val(newDate);
-                        event_end.val(newDate);
-                        formOpen('add');
-                    }
-                });
-            });
-        </script>
     </div>
 </body>
 </html>
