@@ -1,94 +1,66 @@
 package com.tracker.habits.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tracker.habits.entities.Event;
 import com.tracker.habits.entities.User;
+import com.tracker.habits.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/event")
 public class RestWebController {
 
     private com.tracker.habits.repositories.UserRepo userRepo;
+    private UserServiceImpl userServiceImpl;
+
+    @Autowired
+    public void setUserServiceImpl(UserServiceImpl userServiceImpl) {
+        this.userServiceImpl = userServiceImpl;
+    }
 
     @Autowired
     public void setUserRepo(com.tracker.habits.repositories.UserRepo userRepo) {
         this.userRepo = userRepo;
     }
 
-    @GetMapping(value = "/all")
-    public String getEvents(Principal principal) {
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public ModelAndView index(@RequestParam(defaultValue = "All habits") String habit, Principal principal, Model model) {
 
-        return getAllEventsByUserInJson(principal.getName());
-    }
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("index");
 
-    @GetMapping(value = "/add")
-    public String addEvents(
-            @RequestParam(value = "start", required = false) String start,
-            @RequestParam(value = "end", required = false) String end,
-            @RequestParam(value = "type", required = false) String type,
-            Principal principal) {
-
-        String pattern = "dd/MM/yyyy HH:mm";
-        Integer timeZone = 180;
-
-        Event event = new Event();
-
-        if (type != null) {
-            if (type.equals("")) {
-                event.setTitle("Default");
-
-            } else {
-                event.setTitle(type);
-            }
-        }
-
-        try {
-            if (start != null && end != null) {
-                if (start.equals("")) {
-                    event.setStart(new Timestamp(new Date().getTime()));
-                } else {
-                    event.setStart(new Timestamp(new SimpleDateFormat(pattern).parse(start + timeZone).getTime()));
-                }
-
-                if (end.equals("")) {
-                    event.setEnd(new Timestamp(new Date().getTime()));
-                } else {
-                    event.setEnd(new Timestamp(new SimpleDateFormat(pattern).parse(end + timeZone).getTime()));
-                }
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
 
         if (principal != null) {
             User user = userRepo.findOneByUsername(principal.getName());
-            user.getHabits().add(event);
-            userRepo.save(user);
+            model.addAttribute("username", user.getUsername());
         }
 
-        return getAllEventsByUserInJson(principal.getName());
+        return modelAndView;
     }
 
-    private String getAllEventsByUserInJson(String username) {
-        ObjectMapper mapper = new ObjectMapper();
-        String result = "";
-        try {
-            result = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(userRepo.findOneByUsername(username).getHabits());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return result;
+    @GetMapping(value = "/api/event/all")
+    public String getEvents(
+            @RequestParam(value = "type", defaultValue = "All habits") String type,
+            Principal principal) {
+
+        return userServiceImpl.findHabitsByUser(principal.getName(), type);
+    }
+
+    @GetMapping(value = "/api/event/add")
+    public String addEvent(
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "start", required = false) String start,
+            @RequestParam(value = "end", required = false) String end,
+            Principal principal) {
+
+        return userServiceImpl.addEvent(type, start, end, principal);
+    }
+
+    @DeleteMapping(value = "/api/event/delete/{id}")
+    public String deleteEvent(@PathVariable("id") Long id,
+                            Principal principal) {
+        return userServiceImpl.deleteEvent(id, principal);
     }
 }
