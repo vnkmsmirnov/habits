@@ -42,7 +42,7 @@ public class RestWebController {
 
     @GetMapping(value = "/api/event/all")
     public String getEvents(
-            @RequestParam(value = "type", defaultValue = "All habits") String type,
+            @RequestParam(value = "selected", defaultValue = "All habits") String type,
             Principal principal) {
 
         return userServiceImpl.findHabitsByUser(principal.getName(), type);
@@ -50,17 +50,20 @@ public class RestWebController {
 
     @GetMapping(value = "/api/event/add")
     public String addEvent(
+            @RequestParam(value = "selected", defaultValue = "All habits") String selected,
             @RequestParam(value = "type", required = false) String type,
             @RequestParam(value = "start", required = false) String start,
             @RequestParam(value = "end", required = false) String end,
             Principal principal) {
 
-        return userServiceImpl.addEvent(type, start, end, principal);
+        return userServiceImpl.addEvent(selected, type, start, end, principal);
     }
 
     @DeleteMapping(value = "/api/event/delete/{id}")
-    public String deleteEvent(@PathVariable("id") Long id,
+    public String deleteEvent(
+            @RequestParam(value = "selected", defaultValue = "All habits") String selected,
+            @PathVariable("id") Long id,
                             Principal principal) {
-        return userServiceImpl.deleteEvent(id, principal);
+        return userServiceImpl.deleteEvent(selected, id, principal);
     }
 }

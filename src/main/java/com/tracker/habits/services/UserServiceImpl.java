@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserRepository {
                 mapRolesToAuthorities(user.getRoles()));
     }
 
-    public String addEvent(String type, String start, String end, Principal principal) {
+    public String addEvent(String selected, String type, String start, String end, Principal principal) {
         String pattern = "dd/MM/yyyy HH:mm";
         int timeZone = 180;
 
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserRepository {
             userRepo.save(user);
         }
 
-        return findHabitsByUser(principal.getName(), allHabits);
+        return findHabitsByUser(principal.getName(), selected);
     }
 
    public String findHabitsByUser(String username, String type) {
@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserRepository {
         return convertListToJson(result);
    }
 
-   public String deleteEvent(Long id, Principal principal) {
+   public String deleteEvent(String selected, Long id, Principal principal) {
        if (principal != null) {
            User user = userRepo.findOneByUsername(principal.getName());
            List<Event> list = (List<Event>)user.getHabits();
@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserRepository {
            user.getHabits().remove(temp);
            userRepo.save(user);
        }
-       return findHabitsByUser(principal.getName(), allHabits);
+       return findHabitsByUser(principal.getName(), selected);
    }
 
    private String convertListToJson(List<Event> events) {

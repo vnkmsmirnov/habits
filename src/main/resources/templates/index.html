@@ -59,7 +59,7 @@
         </div>
         <form action="/" method="get">
             <div class="form-row">
-                    <div class="form-group col-sm-6 col-md-2 text-center">
+                    <div class="form-group col-sm-6 col-md-2 text-center" id="dropdown">
                         <label for="habit"><b>Filter habits</b></label>
                         <select class="form-control" id="habit" name="habit"></select>
                     </div>
@@ -90,14 +90,13 @@
             var form = $('#dialog-form');
             var format = "DD/MM/YYYY HH:mm";
 
-
             $(function(){
-                $("#habit").change(function(){
+                $("#habit").change(function() {
                     jQuery.ajax({
                         url: "/api/event/all",
                         type: "GET",
                         data: {
-                            type: $('#habit').val()
+                            selected: $('#habit :selected').text()
                         },
                         contentType: 'application/json; charset=utf-8',
                         success: function(resultData) {
@@ -110,7 +109,6 @@
             });
 
             $(function () {
-
                 $('add_event_button').button().click(function(e) {
                     $('#dialog-form').dialog("open")
                 });
@@ -121,11 +119,11 @@
                         id: 'add',
                         text: 'Добавить',
                         click: function() {
-
                             $.ajax({
                                 type: "GET",
                                 url: "/api/event/add",
                                 data: {
+                                    selected: $('#habit :selected').text(),
                                     type: event_type.val(),
                                     start: event_start.val(),
                                     end: event_end.val(),
@@ -134,13 +132,7 @@
                                     var sample = JSON.parse(resultData);
                                     $('#calendar').fullCalendar('removeEventSources');
                                     $('#calendar').fullCalendar('addEventSource', sample);
-                                    const unique = array_unique(sample);
-                                    $('#habit').empty();
-                                    $.each(unique,function()
-                                    {
-                                        $('#habit').append('<option value=' + this.title + '>' + this.title + '</option>');
-                                        $('#select').val();
-                                    });
+                                    getActualEventsForFilter($('#habit :selected').text());
                                 }
                             });
 
@@ -167,17 +159,14 @@
                                 $.ajax({
                                     type: "DELETE",
                                     url: "/api/event/delete/" + event_id.val(),
+                                    data: {
+                                        selected: $('#habit :selected').text()
+                                    },
                                     success: function(resultData){
                                         var sample = JSON.parse(resultData);
                                         $('#calendar').fullCalendar('removeEventSources');
                                         $('#calendar').fullCalendar('addEventSource', sample);
-                                        const unique = array_unique(sample);
-                                        $('#habit').empty();
-                                        $.each(unique,function()
-                                        {
-                                            $('#habit').append('<option value=' + this.title + '>' + this.title + '</option>');
-                                            $('#select').val();
-                                        });
+                                        getActualEventsForFilter($('#habit :selected').text());
                                     },
                                     error : function(jqXHR, textStatus, errorThrown) {
                                     },
@@ -191,6 +180,27 @@
                 });
 
             });
+
+            function getActualEventsForFilter(selectedEvent) {
+                $.ajax({
+                    type: "GET",
+                    url: "/api/event/all",
+                    success: function(resultData) {
+                        var sample = JSON.parse(resultData);
+                        const unique = array_unique(sample);
+                        $('#habit').empty();
+                        $.each(unique,function() {
+                            $('#habit').append('<option value=' + this.title + '>' + this.title + '</option>');
+                            // $('#habit').val();
+                            if (selectedEvent === "" || selectedEvent === "All habits") {
+                                $('#habit').val();
+                            } else {
+                                $('#habit').val(selectedEvent);
+                            }
+                        });
+                    }
+                })
+            }
 
             function array_unique(array) {
                 const unique = [];
@@ -249,32 +259,11 @@
             });
 
             $(document).ready(function() {
-                jQuery.ajax({
-                    url: "/api/event/all",
-                    type: "GET",
-                    data: {
-                        type: $('#habit').val()
-                    },
-                    contentType: 'application/json; charset=utf-8',
-                    success: function(resultData) {
-                        var sample = JSON.parse(resultData);
-                        const unique = array_unique(sample);
-                        $.each(unique,function()
-                        {
-                            $('#habit').append('<option value=' + this.title + '>' + this.title + '</option>');
-                            $('#select').val();
-                        });
-                    },
-                    error : function(jqXHR, textStatus, errorThrown) {
-                    },
-
-                    timeout: 120000,
-                });
                 $('#calendar').fullCalendar({
                     events: {
                         url : '/api/event/all',
                         data: {
-                            type: $('#habit').val()
+                            selected: $('#habit :selected').text()
                         }
                     },
                     firstDay: 1,
@@ -298,6 +287,7 @@
                     formOpen('edit');
                     }
                 });
+                getActualEventsForFilter($('#habit :selected').text());
             });
         </script>
     </div>
