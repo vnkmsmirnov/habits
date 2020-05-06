@@ -26,7 +26,7 @@ public class RestWebController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView index(@RequestParam(defaultValue = "All habits") String habit, Principal principal, Model model) {
+    public ModelAndView index(Principal principal, Model model) {
 
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("index");
@@ -40,6 +40,14 @@ public class RestWebController {
         return modelAndView;
     }
 
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public ModelAndView register(Model model) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("register");
+
+        return modelAndView;
+    }
+
     @GetMapping(value = "/api/event/all")
     public String getEvents(
             @RequestParam(value = "selected", defaultValue = "All habits") String type,
@@ -48,7 +56,7 @@ public class RestWebController {
         return userServiceImpl.findHabitsByUser(principal.getName(), type);
     }
 
-    @GetMapping(value = "/api/event/add")
+    @PostMapping(value = "/api/event/add")
     public String addEvent(
             @RequestParam(value = "selected", defaultValue = "All habits") String selected,
             @RequestParam(value = "type", required = false) String type,
@@ -57,6 +65,17 @@ public class RestWebController {
             Principal principal) {
 
         return userServiceImpl.addEvent(selected, type, start, end, principal);
+    }
+
+    @PostMapping(value = "/api/event/update")
+    public String updateEvent(
+            @RequestParam(value = "selected", defaultValue = "All habits") String selected,
+            @RequestParam(value = "id") Long id,
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "start", required = false) String start,
+            @RequestParam(value = "end", required = false) String end,
+            Principal principal) {
+        return userServiceImpl.updateEvent(selected, id, type, start, end, principal);
     }
 
     @DeleteMapping(value = "/api/event/delete/{id}")

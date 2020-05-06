@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>calendar demo</title>
+    <title>Calendar</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/sunny/jquery-ui.css">
@@ -35,11 +35,15 @@
                                     <input type="password" name="password" id="password" placeholder="Password" class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label for="remember-me" class="text-info"><span>Remember me</span> <span><input id="remember-me" name="remember-me" type="checkbox"></span></label><br>
+                                    <label for="remember-me" class="text-info">
+                                        <span>Remember me</span> 
+                                        <span><input id="remember-me" name="remember-me" type="checkbox"></span>
+                                    </label>
+                                    <br>
                                     <input type="submit" name="submit" class="btn btn-info btn-md" value="submit">
                                 </div>
                                 <div id="register-link" class="text-right">
-                                    <a href="#" class="text-info">Register here</a>
+                                    <a href="/register" class="text-info">Register here</a>
                                 </div>
                             </form>
                         </div>
@@ -120,7 +124,7 @@
                         text: 'Добавить',
                         click: function() {
                             $.ajax({
-                                type: "GET",
+                                type: "POST",
                                 url: "/api/event/add",
                                 data: {
                                     selected: $('#habit :selected').text(),
@@ -135,7 +139,6 @@
                                     getActualEventsForFilter($('#habit :selected').text());
                                 }
                             });
-
                             emptyForm();
                             $(this).dialog('close');
                         }
@@ -143,7 +146,25 @@
                         {   id: 'edit',
                             text: 'Изменить',
                             click: function() {
-                                //some code
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/api/event/update",
+                                    data: {
+                                        selected: $('#habit :selected').text(),
+                                        id: event_id.val(),
+                                        type: event_type.val(),
+                                        start: event_start.val(),
+                                        end: event_end.val(),
+                                    },
+                                    success: function(resultData){
+                                        var sample = JSON.parse(resultData);
+                                        $('#calendar').fullCalendar('removeEventSources');
+                                        $('#calendar').fullCalendar('addEventSource', sample);
+                                        getActualEventsForFilter($('#habit :selected').text());
+                                    }
+                                });
+                                emptyForm();
+                                $(this).dialog('close');
                             }
                         },
                         {   id: 'cancel',
@@ -191,7 +212,6 @@
                         $('#habit').empty();
                         $.each(unique,function() {
                             $('#habit').append('<option value=' + this.title + '>' + this.title + '</option>');
-                            // $('#habit').val();
                             if (selectedEvent === "" || selectedEvent === "All habits") {
                                 $('#habit').val();
                             } else {
